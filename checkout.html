@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Your Order - Leb Gadgets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #ff6600;
+            padding: 15px;
+            text-align: center;
+        }
+        .logo a {
+            color: #fff;
+            font-size: 24px;
+            text-decoration: none;
+            font-weight: bold;
+            display: block;
+            text-align: center;
+        }
+        .container {
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        form label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        form input, form textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .confirm-btn {
+            background-color: #ff6600;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .confirm-btn:hover {
+            background-color: #e65c00;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #FFFDD0;
+            color: black;
+        }
+        .whatsapp-container {
+            position: fixed;
+            right: 60px;
+            bottom: 20px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .whatsapp-logo {
+            width: 50px;
+            transition: transform 0.2s ease-in-out;
+        }
+        .whatsapp-logo:hover {
+            transform: scale(1.1);
+        }
+        .whatsapp-tooltip {
+          position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #25D366;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+        }
+        .whatsapp-container:hover .whatsapp-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <a href="index.html">Leb Gadgets</a>
+    </div>
+</header>
+
+<div class="container">
+    <h2>Confirm Your Order</h2>
+    <form id="order-form">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" required>
+
+        <label for="address">Shipping Address</label>
+        <textarea id="address" required></textarea>
+
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" required>
+        
+        <label for="product-id">Products in Cart</label>
+        <textarea id="product-id" readonly></textarea>
+
+        <label for="notes">Additional Notes (Optional)</label>
+        <textarea id="notes"></textarea>
+
+        <button type="button" class="confirm-btn" onclick="sendEmail()">Confirm Order</button>
+    </form>
+</div>
+
+<div class="whatsapp-container" onclick="sendWhatsAppOrder()">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="whatsapp-logo">
+    <div class="whatsapp-tooltip">
+        Order via WhatsApp
+    </div>
+</div>
+
+<footer>
+    <p>© 2025 Leb Gadgets. All Rights Reserved.</p>
+    <p>🚚 Delivery: $3 | 💰 Payment: Cash on Delivery</p>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let productField = document.getElementById("product-id");
+
+    function updateProductField() {
+        if (cart.length === 0) {
+            productField.value = "No products in cart.";
+        } else {
+            productField.value = cart.map(item => 
+                `${item.name} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`
+            ).join("\n");
+        }
+    }
+
+    updateProductField();
+});
+
+// Function to send order via email
+function sendEmail() {
+    let name = document.getElementById("name").value;
+    let address = document.getElementById("address").value;
+    let phone = document.getElementById("phone").value;
+    let notes = document.getElementById("notes").value;
+    let products = document.getElementById("product-id").value;
+
+    if (!name || !address || !phone || products === "No products in cart.") {
+        alert("Please fill in all required fields and add products to your cart.");
+        return;
+    }
+
+    let subject = `New Order from ${name}`;
+    let body = `Name: ${name}%0D%0AAddress: ${address}%0D%0APhone: ${phone}%0D%0AProducts: ${products}%0D%0AAdditional Notes: ${notes}%0D%0A%0D%0A🚚 Delivery Fee: $3.00%0D%0A💰 Payment Method: Cash on Delivery`;
+
+    window.location.href = `mailto:husseinmsheik897@gmail.com?subject=${subject}&body=${body}`;
+}
+
+// Function to send order via WhatsApp
+function sendWhatsAppOrder() {
+    let name = document.getElementById("name").value.trim();
+    let address = document.getElementById("address").value.trim();
+    let phone = document.getElementById("phone").value.trim();
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    if (!name || !address || !phone || cart.length === 0) {
+        alert("Please fill in all details and add products to the cart before ordering.");
+        return;
+    }
+
+    let orderDetails = cart.map(item => `${item.name} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`).join("%0A");
+
+    let message = `Hello, I want to place an order:%0A%0A`
+        + `*Name:* ${name}%0A`
+        + `*Address:* ${address}%0A`
+        + `*Phone:* ${phone}%0A%0A`
+        + `*Order Details:*%0A${orderDetails}%0A%0A`
+        + `*Total Price:* $${cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}%0A`
+        + `*Delivery Fee:* $3%0A`
+        + `*Payment:* Cash on Delivery`;
+
+    let whatsappNumber = "+96176818912";
+    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
+}
+</script>
+
+</body>
+</html>
